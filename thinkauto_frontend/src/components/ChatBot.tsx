@@ -37,43 +37,17 @@ const ChatBot = () => {
 
   const sendMessageToGroq = async (userMessage: string) => {
     try {
-      const response = await fetch(GROQ_API_URL, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${GROQ_API_KEY}`,
-        },
-        body: JSON.stringify({
-          model: "mixtral-8x7b-32768",
-          messages: [
-            {
-              role: "system",
-              content: "You are ThinkAuto AI, a helpful and intelligent IT helpdesk assistant for ThinkAuto company. You help employees with technical issues, software problems, hardware troubleshooting, network connectivity, access requests, and general IT queries. Be concise, professional, and helpful. If you can't solve an issue directly, suggest creating a support ticket."
-            },
-            ...messages.map(m => ({
-              role: m.role === "bot" ? "assistant" : "user",
-              content: m.text
-            })),
-            {
-              role: "user",
-              content: userMessage
-            }
-          ],
-          temperature: 0.7,
-          max_tokens: 1024,
-          top_p: 1,
-          stream: false
-        }),
+      const response = await api.post("/chat/message", {
+        userMessage,
+        conversationHistory: messages.slice(-10).map(m => ({
+          role: m.role === "bot" ? "assistant" : "user",
+          content: m.text
+        }))
       });
 
-      if (!response.ok) {
-        throw new Error(`API error: ${response.status}`);
-      }
-
-      const data = await response.json();
-      return data.choices[0]?.message?.content || "I apologize, but I couldn't generate a response. Please try again.";
-    } catch (error) {
-      console.error("Groq API error:", error);
+      return response.data.response || "I apologize, but I couldn't generate a response. Please try again.";
+    } catch (error: any) {
+      console.error("Chat API error:", error);
       return "I'm having trouble connecting right now. Please try again in a moment or create a support ticket for immediate assistance.";
     }
   };

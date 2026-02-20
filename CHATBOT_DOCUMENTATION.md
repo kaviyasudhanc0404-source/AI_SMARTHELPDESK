@@ -29,16 +29,19 @@ The AI-powered chatbot and consultation logs system provides intelligent IT supp
 
 #### Configuration:
 ```typescript
-// API key is stored in environment variable for security
-const GROQ_API_KEY = import.meta.env.VITE_GROQ_API_KEY || "";
-const GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions";
+// Frontend calls backend API endpoint
+const response = await api.post("/chat/message", {
+  userMessage,
+  conversationHistory
+});
 ```
 
-**Environment Setup:**
-Create a `.env` file in `thinkauto_frontend/` directory:
+**Backend Environment Setup** (`thinkauto_backend/.env`):
 ```env
-VITE_GROQ_API_KEY=your_groq_api_key_here
+GROQ_API_KEY=your_groq_api_key_here
 ```
+
+**Security**: API key is securely stored in backend .env file and never exposed to the frontend.
 
 #### System Prompt:
 The chatbot is configured as "ThinkAuto AI", a helpful IT helpdesk assistant that:
